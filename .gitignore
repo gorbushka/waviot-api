@@ -1,0 +1,5 @@
+__pycache__
+__pycache__/*
+secret.yml
+*.log
+try.py
