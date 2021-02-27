@@ -16,7 +16,7 @@ class Waviot:
         if r.status_code==200:
             try:
                 WAVIOT_JWT=json.loads(r.text)['WAVIOT_JWT']
-                print(WAVIOT_JWT)
+                #print(WAVIOT_JWT)
                 self.WAVIOT_JWT=WAVIOT_JWT
             except:
                 print("no WAVIOT_JWT")
@@ -38,24 +38,33 @@ class Waviot:
                 print(f"no response {r.text}")
         else:
             print("error",r.status_code)
-            print("something goes wrong",r.headers)
+            print("something goes wrong - headers:\n",r.headers)
         return response
-   
+
+    def print_raw_response(self):
+        print(self.response)
+
+
     def parse_response_roll(self):
         for modem in self.response:
-            print(modem)
+            print(f"---{modem}---")
             for record in self.response[modem]:
-                print("NEW RECORD\n {} \n===========\n".format(record))
+                print("NEW RECORD {}\n {} \n===========\n".format(record['protocol'],record))
                 try:
                     print("timestamp: {}, snr: {}, rssi: {}".format(
                           record['timestamp'],
                           record['snr'],record['rssi']))
                 except:
                     print("no")
-                try:
-                    for sensor in record['data'].values():
-                        print("sensor:{},value:{}".format(sensor['name'],sensor['value']))
-                    print("\n==========\n")
-                except:
-                    print ("no")
+                if record['protocol']=='water7':
+                    try:
+                        for sensor in record['data'].values():
+                            print("sensor:{},value:{}".format(sensor['name'],sensor['value']))
+                        print("\n==========\n")
+                    except:
+                        print ("no")
+                elif record['protocol']!='water7':
+                    record['data']
+
+            print("----------------")
         return True
