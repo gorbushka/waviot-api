@@ -30,6 +30,7 @@ class Waviot:
         #return WAVIOT_JWT
 
     def get_request(self,url):
+        print(url)
         header = {'Content-type': 'application/json',
                   'X-requested-with': 'XMLHttpRequest',
                   'Authorization': 'bearer ' + self.WAVIOT_JWT}
@@ -49,15 +50,15 @@ class Waviot:
         print(self.response)
 
 
-    def parse_response_roll(self):
+    def print_response_roll(self):
         for modem in self.response:
             print(f"---{modem}---")
             for record in self.response[modem]:
-                print("NEW RECORD {}\n {} \n===========\n".format(record['protocol'],record))
+                print("===== NEW RECORD {} =======\n {} \n===========\n".format(record['protocol'],record))
                 try:
-                    print("timestamp: {}, snr: {}, rssi: {}".format(
+                    print("timestamp: {}, snr: {}, rssi: {}, station: {}".format(
                           record['timestamp'],
-                          record['snr'],record['rssi']))
+                          record['snr'],record['rssi'],record['station_id']))
                 except:
                     print("no")
                 if record['protocol']=='water7':
@@ -67,11 +68,15 @@ class Waviot:
                         print("\n==========\n")
                     except:
                         print ("no")
-                elif record['protocol']!='water7':
-                    record['data']
+                elif record['protocol']=='water6':
+                    code=record['payload'][-8:-4]
+                    print(code)
+                else:
+                    print(f"no parser for proto {record['data']}")
 
             print("----------------")
         return True
+
 
     
     def get_subtree(self,elem_id):
@@ -102,7 +107,7 @@ class Waviot:
         elements=self.get_subtree(elem_id)
         modems={}
         for element in elements.values():
-            pprint(element)
+           
             modems.update(self.get_modems_inelem(element))
         return modems
 
