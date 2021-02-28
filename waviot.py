@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 import requests
 import json
+from pprint import pprint
 
 class Waviot:
     login_url='https://auth.waviot.ru/?action=user-login'
+    get_tree_url='https://lk.waviot.ru/api.tree/get_tree/'
+    get_modems_url='https://lk.waviot.ru/api.tree/get_modems/'
+    
     def __init__(self, login, password):
         self.login = login
         self.password = password
@@ -32,14 +36,14 @@ class Waviot:
         r=requests.get(url,headers=header)
         if r.status_code==200:
             try:
-                response=json.loads(r.text)
-                self.response=response
+                reqresponse=json.loads(r.text)
+                self.response=reqresponse
             except:
                 print(f"no response {r.text}")
         else:
             print("error",r.status_code)
             print("something goes wrong - headers:\n",r.headers)
-        return response
+        return reqresponse
 
     def print_raw_response(self):
         print(self.response)
@@ -68,3 +72,37 @@ class Waviot:
 
             print("----------------")
         return True
+
+    
+    def get_subtree(self,elem_id):
+        url=f'{self.get_tree_url}?id={elem_id}'
+        reqresponse=self.get_request(url)
+        subtree={}
+        if reqresponse.get('tree')!=None:
+            subtree=reqresponse['tree']
+        return subtree
+
+ 
+    def get_modems_inelem(self,elem_dict):
+        elem_id=elem_dict['id']   
+        url=f'{self.get_modems_url}?id={elem_id}'
+        reqresponse=self.get_request(url)
+        modems={}
+        if reqresponse.get('modems')!=None:
+            for modem in reqresponse.get('modems'):
+                modems[modem['id']]={'flavor_id':modem['flavor_id'],
+                                     'temperature':modem['temperature'],
+                                    'battery':modem['battery'],
+                                    'elem_name':elem_dict['name'],
+                                    'elem_type':elem_dict['type']
+                                    }
+        return modems
+    
+    def get_modems_intree(self,elem_id):
+        elements=self.get_subtree(elem_id)
+        modems={}
+        for element in elements.values():
+            pprint(element)
+            modems.update(self.get_modems_inelem(element))
+        return modems
+
