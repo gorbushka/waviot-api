@@ -30,7 +30,7 @@ class Waviot:
         #return WAVIOT_JWT
 
     def get_request(self,url):
-        print(url)
+        #print(url)
         header = {'Content-type': 'application/json',
                   'X-requested-with': 'XMLHttpRequest',
                   'Authorization': 'bearer ' + self.WAVIOT_JWT}
