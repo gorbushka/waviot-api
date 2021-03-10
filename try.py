@@ -88,9 +88,9 @@ def roll_event_parser(response,significant_diff):
                 elif diff>significant_diff:
                     alarm[alarm_key]={'timestamp':timestamp,'modem_id':modem,'value':current_value,'state':'Падение давления'}
                     #alarms.append(alarm)
-                elif current_value<6.7:
+                elif current_value<1:
                     alarm[alarm_key]={'timestamp':timestamp,'modem_id':modem,'value':current_value,'state':'Давление меньше 1бар'}
-                elif current_value>10:
+                elif current_value>3:
                     alarm[alarm_key]={'timestamp':timestamp,'modem_id':modem,'value':current_value,'state':'Давление больше уставки '}
 
                 logging.debug(f"modem {modem} event water7 timestamp:{timestamp}, current_value: {current_value}, prev_value: {prev_value}, diff: {diff}")
@@ -116,7 +116,8 @@ def alarm_manage(creds,alarms,modems):
         date_time=datetime.utcfromtimestamp(alarm['timestamp']+utc_offset).strftime('%Y-%m-%d %H:%M:%S')
         modem_name=modems[alarm_modem_id]['elem_name']
         temperature=modems[alarm_modem_id]['temperature']
-        pressure=((alarm['value']-4)/16)*6
+        max_pr=16 #max I for presure sensor
+        pressure=((alarm['value']-4)/16)*max_pr
         alarm_message=f"{date_time} модем: {alarm_modem_id} ({alarm['modem_id']})) температура: {temperature}\n Место установки: {modem_name} событие: {alarm['state']} ({pressure:.2f}бар) - ток {alarm['value']}"
         if alarm_modem_id!='7a48ad':
             send_alarm(creds,alarm_message)
