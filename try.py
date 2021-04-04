@@ -88,9 +88,9 @@ def roll_event_parser(response,significant_diff):
                 elif diff>significant_diff:
                     alarm[alarm_key]={'timestamp':timestamp,'modem_id':modem,'value':current_value,'state':'Падение давления'}
                     #alarms.append(alarm)
-                elif current_value<1:
+                elif current_value<5:
                     alarm[alarm_key]={'timestamp':timestamp,'modem_id':modem,'value':current_value,'state':'Давление меньше 1бар'}
-                elif current_value>3:
+                elif current_value>7:
                     alarm[alarm_key]={'timestamp':timestamp,'modem_id':modem,'value':current_value,'state':'Давление больше уставки '}
 
                 logging.debug(f"modem {modem} event water7 timestamp:{timestamp}, current_value: {current_value}, prev_value: {prev_value}, diff: {diff}")
@@ -134,6 +134,8 @@ def main():
 
     vault_pass=os.getenv('VAULT',default='unknown')
     creds=get_creds_vault('secret.yml',vault_pass)
+ 
+        
     wa=waviot.Waviot(creds['login'],creds['password'])
     wa.get_login()
     #$modems=wa.get_modems_intree('827132')
