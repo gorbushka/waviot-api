@@ -14,9 +14,16 @@ import tg
 
 logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
-def get_creds_vault(vault_file,vault_password):                                         
-    vault = Vault(vault_password)                                                      
-    secrets = vault.load(open(vault_file).read())                                
+def get_creds_vault(vault_file,vault_password):
+    try:
+        vault = Vault(vault_password)
+        secrets = vault.load(open(vault_file).read())
+    except:
+        err=f"can't decode {vault_file}"
+        print(err)
+        logging.debug(f"ERROR: {err}")
+        sys.exit()
+                              
     #####HACK for ansible version https://github.com/tomoh1r/ansible-vault/pull/34      
     #vault = VaultLib([(DEFAULT_VAULT_ID_MATCH, VaultSecret(vault_password.encode()))])  
     #secrets = yaml.safe_load(vault.decrypt(open(vault_file).read()))                    
@@ -133,7 +140,14 @@ def main():
     logging.debug(f"run {now_date}({readabledate})")
 
     vault_pass=os.getenv('VAULT',default='unknown')
-    creds=get_creds_vault('secret.yml',vault_pass)
+     try:
+        creds=get_creds_vault(os.path.dirname(os.path.abspath(__file__))+'/secret1.yml',vault_pass)
+    except OSError as e:
+        err=f"cant'open secret file {e}"
+        logging.debug(f"ERROR: {err}")
+        print(err)
+        sys.exit(e.errno)
+
  
         
     wa=waviot.Waviot(creds['login'],creds['password'])
