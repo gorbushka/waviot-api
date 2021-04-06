@@ -14,4 +14,4 @@ pycparser==2.20
 pyparsing==2.4.7
 PyYAML==5.4.1
 requests==2.25.1
-urllib3==1.26.3
+urllib3==1.26.4
