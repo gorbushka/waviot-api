@@ -1,4 +1,4 @@
-ansible==4.2.0
+ansible==7.0.0
 ansible-base==2.10.6
 ansible-vault==2.1.0
 certifi==2022.12.7
